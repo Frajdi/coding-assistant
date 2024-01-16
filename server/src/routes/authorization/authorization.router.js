@@ -1,35 +1,20 @@
 const express = require("express");
-const passport = require("passport");
+const { 
+    logOut,
+    authFail,
+    authenticateWithGitHub,
+    authenticationCallback
+} = require('./authorization.controller');
 
 const authRouter = express.Router();
 
 
-authRouter.get(
-    "/github",
-    passport.authenticate("github", {
-      scope: ["user:email", "read:repo_hook"],
-    })
-);
+authRouter.get("/github", authenticateWithGitHub);
 
-authRouter.get(
-  "/github/callback",
-  passport.authenticate("github", {
-    failureRedirect: "/failure",
-    successRedirect: "/",
-    session: true,
-  }),
-  (req, res) => {
-    console.log("Github called us back!");
-  }
-);
+authRouter.get("/github/callback", authenticationCallback);
 
-authRouter.get("/logout", (req, res) => {
-  req.logOut();
-  return res.redirect("/");
-});
+authRouter.get("/logout", logOut);
 
-authRouter.get("/failure", (req, res) => {
-  return res.send("Failed to log in!");
-});
+authRouter.get("/failure", authFail);
 
 module.exports = authRouter;

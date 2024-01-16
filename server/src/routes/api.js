@@ -1,5 +1,5 @@
 const express = require("express");
-const userRouter = require('./users/users.router');
+const userRouter = require('./repos/repos.router');
 const authRouter = require('./authorization/authorization.router');
 const passport = require("passport");
 const cookieSession = require("cookie-session");
@@ -20,9 +20,7 @@ const createNewUser = async (id, userName, accessToken) => {
       console.log(error);
       return;
     }
-  };
-
-//---------------------
+};
 
 
 const config = {
@@ -71,6 +69,6 @@ api.use(passport.initialize());
 api.use(passport.session());
 
 api.use('/auth', authRouter);
-api.use('/user', userRouter);
+api.use('/repos', userRouter);
 
 module.exports = api;
