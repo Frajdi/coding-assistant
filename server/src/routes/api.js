@@ -1,27 +1,12 @@
 const express = require("express");
-const userRouter = require('./repos/repos.router');
-const authRouter = require('./authorization/authorization.router');
 const passport = require("passport");
 const cookieSession = require("cookie-session");
 const { Strategy } = require("passport-github2");
-const pool = require('../services/db');
-
+const repoRouter = require('./repos/repos.router');
+const { createNewUser } = require('../models/users.model');
+const authRouter = require('./authorization/authorization.router');
 
 const api = express.Router();
-
-const createNewUser = async (id, userName, accessToken) => {
-    try { 
-      const res = await pool.query(
-        "INSERT INTO users(id, user_name, access_token) VALUES($1, $2, $3) RETURNING *",
-        [id, userName, accessToken]
-      );
-      return console.log(res.rows[0]);
-    } catch (error) {
-      console.log(error);
-      return;
-    }
-};
-
 
 const config = {
     CLIENT_ID: "c020288fd5a399a67e79",
@@ -69,6 +54,6 @@ api.use(passport.initialize());
 api.use(passport.session());
 
 api.use('/auth', authRouter);
-api.use('/repos', userRouter);
+api.use('/repos', repoRouter);
 
 module.exports = api;

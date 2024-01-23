@@ -6,7 +6,7 @@ const app = require('./app');
 const initializeDatabse = require('./services/initializeDB');
 
 
-const PORT = 3000;
+const PORT = 3001;
 
 app.get("/", (req, res) => {
   return res.sendFile(path.join(__dirname, "../", "public", "index.html"));

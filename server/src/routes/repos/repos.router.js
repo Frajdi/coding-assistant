@@ -1,12 +1,11 @@
 const express = require("express");
-const { checkLoggedIn, getAllRepositories } = require('./repos.controller');
+const { checkLoggedIn, getAllRepositories, getRepoContentsByName } = require('./repos.controller');
 
 
-  const userRouter = express.Router();
+  const repoRouter = express.Router();
 
-  userRouter.get("/", checkLoggedIn, getAllRepositories);
+  repoRouter.get("/", checkLoggedIn, getAllRepositories);
 
-  module.exports = userRouter;
-  
+  repoRouter.get("/:repo_name", getRepoContentsByName);
 
-  
+  module.exports = repoRouter;
