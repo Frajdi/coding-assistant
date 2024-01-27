@@ -130,7 +130,6 @@ const fetchFilesRecursively = async (owner, repo, path, accessToken) => {
 
 
 
-
 const getRepoContentsByName = async (req, res) => {
   const { repo_name } = req.params;
 
@@ -139,11 +138,23 @@ const getRepoContentsByName = async (req, res) => {
 
     const repoContent = await fetchFilesRecursively(user_name, repo_name, '', access_token);
     console.log(repoContent);
+    // Format the content property of each object
+    repoContent.forEach((obj) => {
+      if (typeof obj.content === 'string') {
+        // Replace newline characters with <br> tags
+        obj.content = obj.content.replace(/\n/g, '@newLine@');
+      }
+    });
+
+    // Send the formatted repoContent to the frontend
     res.json(repoContent);
   } catch (error) {
     console.error(error.message);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 };
+
+
+
 
 module.exports = { checkLoggedIn, getAllRepositories, getRepoContentsByName};

@@ -1,0 +1,32 @@
+{
+  "name": "client",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "vite",
+    "build": "vite build",
+    "build-docker": "BUILD_PATH=../server/public vite build build",
+    "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@mui/icons-material": "^5.15.6",
+    "@mui/joy": "^5.0.0-beta.24",
+    "@mui/x-tree-view": "^6.17.0",
+    "axios": "^1.6.5",
+    "react": "^18.2.0",
+    "react-chat-elements": "^12.0.11",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.43",
+    "@types/react-dom": "^18.2.17",
+    "@vitejs/plugin-react": "^4.2.1",
+    "eslint": "^8.55.0",
+    "eslint-plugin-react": "^7.33.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.5",
+    "vite": "^5.0.8"
+  }
+}
