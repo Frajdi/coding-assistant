@@ -1,5 +1,9 @@
 You can run the app with `npm run deploy` command.
 
+
+This is the schema of how the comunication with ai works.
+![Alt text](image.png)
+
 TODO: 
 
 - Create a front end route to authorize with github.
