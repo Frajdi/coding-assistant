@@ -9,11 +9,12 @@ const initializeDatabse = require('./services/initializeDB');
 
 const PORT = 3000;
 
-// app.get("/", (req, res) => {
-//   return res.sendFile(path.join(__dirname, '../../client/dist/index.html'));
-// });
-
 app.use(express.static(path.join(__dirname, '../../client/dist')));
+
+// Handle all other routes by sending the 'index.html' file
+app.get('/*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../../client/dist/index.html'));
+});
 
 
 const startServer = async () => {

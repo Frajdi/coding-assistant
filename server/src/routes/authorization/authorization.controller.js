@@ -10,7 +10,7 @@ const authenticateWithGitHub = (req, res, next) => {
 const authenticationCallback = (req, res, next) => {
   passport.authenticate("github", {
     failureRedirect: "/failure",
-    successRedirect: "/",
+    successRedirect: "/projects",
     session: true,
   })(req, res, next);
 

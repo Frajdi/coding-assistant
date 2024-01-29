@@ -12,12 +12,38 @@ const checkLoggedIn = (req, res, next) => {
   next();
 };
 
+// const getAllRepositories = async (req, res) => {
+//   try {
+//     const { user_name, access_token } = await getUserById(req.user);
+
+//     // Fetch user's repositories using the GitHub API
+//     const { data } = await axios.get(
+//       `https://api.github.com/users/${user_name}/repos`,
+//       {
+//         headers: {
+//           Authorization: `Bearer ${access_token}`,
+//         },
+//       }
+//     );
+
+//     return res.json({
+//       user: user_name,
+//       repositories: data,
+//     });
+//   } catch (error) {
+//     console.log(error.message);
+//     return res.status(500).json({
+//       error: "Failed to fetch repositories",
+//     });
+//   }
+// };
+
 const getAllRepositories = async (req, res) => {
   try {
     const { user_name, access_token } = await getUserById(req.user);
 
     // Fetch user's repositories using the GitHub API
-    const { data } = await axios.get(
+    const { data: repositories } = await axios.get(
       `https://api.github.com/users/${user_name}/repos`,
       {
         headers: {
@@ -26,9 +52,32 @@ const getAllRepositories = async (req, res) => {
       }
     );
 
+    // Fetch owner's data and languages_url for each repository
+    const repositoriesWithDetails = await Promise.all(
+      repositories.map(async (repo) => {
+        const ownerData = await axios.get(repo.owner.url, {
+          headers: {
+            Authorization: `Bearer ${access_token}`,
+          },
+        });
+
+        const languagesData = await axios.get(repo.languages_url, {
+          headers: {
+            Authorization: `Bearer ${access_token}`,
+          },
+        });
+
+        return {
+          ...repo,
+          owner: ownerData.data,
+          languages: languagesData.data,
+        };
+      })
+    );
+
     return res.json({
       user: user_name,
-      repositories: data,
+      repositories: repositoriesWithDetails,
     });
   } catch (error) {
     console.log(error.message);
@@ -38,47 +87,6 @@ const getAllRepositories = async (req, res) => {
   }
 };
 
-
-// const fetchFilesRecursively = async (owner, repo, path, accessToken) => {
-//   const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
-
-//   const headers = {
-//     Authorization: `Bearer ${accessToken}`,
-//     Accept: 'application/vnd.github.v3.raw', // Specify raw content response
-//   };
-
-//   try {
-//     const response = await axios.get(url, { headers });
-
-//     if (response.status !== 200) {
-//       throw new Error(`Failed to fetch directory content. Status code: ${response.status}`);
-//     }
-
-//     const contents = response.data;
-
-//     // Process each item in the directory
-//     const filePromises = contents.map(async (item) => {
-//       if (item.type === 'file') {
-//         const fileUrl = item.download_url || item.url; // Use download_url if available
-//         const fileContentResponse = await axios.get(fileUrl, { headers });
-//         const fileContent = fileContentResponse.data;
-
-//         return {
-//           path: item.path,
-//           content: fileContent,
-//         };
-//       } else if (item.type === 'dir') {
-//         // Recursively fetch files in subdirectories
-//         return fetchFilesRecursively(owner, repo, item.path, accessToken);
-//       }
-//     });
-
-//     return Promise.all(filePromises);
-//   } catch (error) {
-//     console.error(error.message);
-//     throw error; // Re-throw the error to propagate it up the call stack
-//   }
-// };
 
 const fetchFile = async (file, accessToken) => {
   const fileUrl = file.download_url || file.url;

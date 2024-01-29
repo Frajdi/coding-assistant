@@ -16,6 +16,14 @@ app.use(
   
 app.use('/v1', api);
 app.use(helmet());
+app.use(
+  helmet.contentSecurityPolicy({
+    useDefaults: true,
+    directives: {
+      "img-src": ["'self'", "https: data:"]
+    }
+  })
+)
   
 module.exports = app;
    
