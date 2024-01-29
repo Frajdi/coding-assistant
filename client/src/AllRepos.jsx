@@ -13,8 +13,25 @@ const AllRepos = () => {
   const [owner, setOwner] = useState(null);
 
   useEffect(() => {
-    getResponse();
+    clearDBGetResponse()
   }, []);
+
+  const clearDBGetResponse = async() => {
+    await getResponse();
+    await clearDatabase();
+  }
+
+  const clearDatabase = async () => {
+    const url = "https://localhost:3000/v1/vectorize/truncation";
+
+    try {
+      const { data } = await axios.get(url);
+      console.log(data);
+    } catch (error) {
+      // Handle errors
+      console.error(error);
+    }
+  };
 
   const getResponse = async (question, conv_history) => {
     const url = "https://localhost:3000/v1/repos";
@@ -39,7 +56,7 @@ const AllRepos = () => {
     setOwner(repoData.owner);
   };
 
-    if(!repos && !owner) return "Loading..."
+  if (!repos && !owner) return "Loading...";
 
   return (
     <Stack sx={{ padding: "3rem" }} spacing={2}>

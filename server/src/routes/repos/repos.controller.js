@@ -2,7 +2,6 @@ const axios = require("axios");
 const { getUserById } = require("../../models/users.model");
 
 const checkLoggedIn = (req, res, next) => {
-  console.log(req);
   const logedIn = req.isAuthenticated() && req.user;
   if (!logedIn) {
     return res.status(401).json({
@@ -87,7 +86,6 @@ const getAllRepositories = async (req, res) => {
   }
 };
 
-
 const fetchFile = async (file, accessToken) => {
   const fileUrl = file.download_url || file.url;
   const headers = {
@@ -101,10 +99,15 @@ const fetchFile = async (file, accessToken) => {
 };
 
 const processItem = async (item, owner, repo, accessToken) => {
-  if (item.type === 'file') {
+  if (item.type === "file") {
     return fetchFile(item, accessToken);
-  } else if (item.type === 'dir') {
-    const subdirectoryContent = await fetchFilesRecursively(owner, repo, item.path, accessToken);
+  } else if (item.type === "dir") {
+    const subdirectoryContent = await fetchFilesRecursively(
+      owner,
+      repo,
+      item.path,
+      accessToken
+    );
     return subdirectoryContent;
   }
 };
@@ -113,19 +116,23 @@ const fetchFilesRecursively = async (owner, repo, path, accessToken) => {
   const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
   const headers = {
     Authorization: `Bearer ${accessToken}`,
-    Accept: 'application/vnd.github.v3.raw',
+    Accept: "application/vnd.github.v3.raw",
   };
 
   try {
     const response = await axios.get(url, { headers });
 
     if (response.status !== 200) {
-      throw new Error(`Failed to fetch directory content. Status code: ${response.status}`);
+      throw new Error(
+        `Failed to fetch directory content. Status code: ${response.status}`
+      );
     }
 
     const contents = response.data;
 
-    const filePromises = contents.map(item => processItem(item, owner, repo, accessToken));
+    const filePromises = contents.map((item) =>
+      processItem(item, owner, repo, accessToken)
+    );
 
     const result = await Promise.all(filePromises);
 
@@ -136,7 +143,20 @@ const fetchFilesRecursively = async (owner, repo, path, accessToken) => {
   }
 };
 
+const getRepoByName = async (repoName, accessToken, userName) => {
+  try {
+    const repoContent = await fetchFilesRecursively(
+      userName,
+      repoName,
+      "",
+      accessToken
+    );
 
+    return repoContent;
+  } catch (error) {
+    throw new Error(`failed to fetch repo ${repoName}`);
+  }
+};
 
 const getRepoContentsByName = async (req, res) => {
   const { repo_name } = req.params;
@@ -144,13 +164,12 @@ const getRepoContentsByName = async (req, res) => {
   try {
     const { user_name, access_token } = await getUserById(req.user);
 
-    const repoContent = await fetchFilesRecursively(user_name, repo_name, '', access_token);
-    console.log(repoContent);
+    const repoContent = await getRepoByName(repo_name, access_token, user_name);
     // Format the content property of each object
     repoContent.forEach((obj) => {
-      if (typeof obj.content === 'string') {
+      if (typeof obj.content === "string") {
         // Replace newline characters with <br> tags
-        obj.content = obj.content.replace(/\n/g, '@newLine@');
+        obj.content = obj.content.replace(/\n/g, "@newLine@");
       }
     });
 
@@ -158,11 +177,8 @@ const getRepoContentsByName = async (req, res) => {
     res.json(repoContent);
   } catch (error) {
     console.error(error.message);
-    res.status(500).json({ error: 'Internal Server Error' });
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
-
-
-
-module.exports = { checkLoggedIn, getAllRepositories, getRepoContentsByName};
+module.exports = { checkLoggedIn, getAllRepositories, getRepoContentsByName, getRepoByName };

@@ -1,4 +1,5 @@
 import React from "react";
+import {useNavigate} from "react-router-dom"
 import Paper from "@mui/material/Paper";
 import Chip from "@mui/material/Chip";
 import Typography from "@mui/material/Typography";
@@ -8,6 +9,7 @@ import Fab from "@mui/material/Fab";
 import CircularProgress from "@mui/material/CircularProgress";
 import { SparkLineChart } from "@mui/x-charts/SparkLineChart";
 import PsychologyIcon from "@mui/icons-material/Psychology";
+import axios from 'axios';
 
 const buttonSx = {
   "&:hover": {
@@ -16,8 +18,30 @@ const buttonSx = {
 };
 
 const RepoCard = ({ repoData }) => {
+  const navigate = useNavigate()
   const { languages, name, updated_at, visibility } = repoData;
   const loading = false;
+
+  const fillDataBase = async (repoName) => {
+    const url = `https://localhost:3000/v1/vectorize/sync-data/${repoName}`;
+
+    try {
+      const response = await axios.get(url);
+      console.log(response);
+    } catch (error) {
+      // Handle errors
+      console.error(error);
+    }
+  };
+
+  const handlefetchRepo = async(repoName) =>{
+      try {
+        await fillDataBase(repoName)
+        navigate(`/repo/${repoName}`)
+      } catch (error) {
+        console.log(error);
+      }
+  } 
 
   const splitObjectKeysAndValues = (inputObject) => {
     const keysArray = Object.keys(inputObject);
@@ -65,7 +89,7 @@ const RepoCard = ({ repoData }) => {
             aria-label="save"
             color="primary"
             sx={buttonSx}
-            onClick={() => {}}
+            onClick={() => {handlefetchRepo(name)}}
           >
             <PsychologyIcon sx={{ fontSize: "3rem" }} />
           </Fab>

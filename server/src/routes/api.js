@@ -6,6 +6,7 @@ const repoRouter = require("./repos/repos.router");
 const { createNewUser } = require("../models/users.model");
 const authRouter = require("./authorization/authorization.router");
 const artificialIntelligenceRouter = require("./ai_LLM/question.router");
+const vectorizeRouter = require('./vectorize/vectorize.router');
 
 const api = express.Router();
 
@@ -57,5 +58,6 @@ api.use(passport.session());
 api.use("/auth", authRouter);
 api.use("/repos", repoRouter);
 api.use("/ai", artificialIntelligenceRouter);
+api.use("/vectorize", vectorizeRouter);
 
 module.exports = api;

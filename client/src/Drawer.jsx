@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import Box from "@mui/material/Box";
 import Drawer from "@mui/material/Drawer";
 import AppBar from "@mui/material/AppBar";
@@ -21,6 +22,7 @@ export default function ClippedDrawer() {
   const [fullData, setFullData] = useState(null);
   const [currentPath, setCurrentPath] = useState(null);
   const [currentContent, setCurrentContent] = useState(null);
+  const { reponame } = useParams();
 
   useEffect(() => {
     fetchFolderStructure();
@@ -36,7 +38,7 @@ export default function ClippedDrawer() {
   const fetchFolderStructure = async () => {
     try {
       const { data } = await axios.get(
-        "https://localhost:3000/v1/repos/AI-TODO-HELPER"
+        `https://localhost:3000/v1/repos/${reponame}`
       );
       console.log(data);
       setFullData(data);
@@ -194,7 +196,7 @@ export default function ClippedDrawer() {
             console.log(line);
             if (!line) return;
             return (
-              <Typography m={0} color='primary'>
+              <Typography m={0} color="primary">
                 <pre style={{ margin: 0 }}>{line}</pre>
               </Typography>
             );
