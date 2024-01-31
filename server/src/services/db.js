@@ -1,6 +1,6 @@
-const { Pool } = require('pg');
+const { Client } = require('pg');
 
-const pool = new Pool({
+const client = new Client({
     host: 'db',       // Use the actual Docker host IP
     port: 5432,               // Default PostgreSQL port
     user: 'postgres',
@@ -8,4 +8,5 @@ const pool = new Pool({
     password: 'postgres'
 });
 
-module.exports = pool;
+
+module.exports = client;

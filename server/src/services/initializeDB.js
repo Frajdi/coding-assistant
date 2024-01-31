@@ -1,12 +1,20 @@
-const pool = require("./db");
+const pgvector = require('pgvector/pg');
+const client = require("./db");
+var pg = require('pg');
 
 const initializeDatabse = async () => {
   try {
-    await pool.query(`CREATE EXTENSION IF NOT EXISTS vector;`);
-    await pool.query(
+
+    await client.connect()
+
+    await client.query(`CREATE EXTENSION IF NOT EXISTS vector;`);
+    
+    await pgvector.registerType(client);
+
+    await client.query(
       "CREATE TABLE IF NOT EXISTS users(id INT, user_name VARCHAR(50), access_token VARCHAR(50))"
     );
-    await pool.query(
+    await client.query(
       `CREATE TABLE IF NOT EXISTS
         DOCUMENTS (
           ID BIGSERIAL PRIMARY KEY,
@@ -15,7 +23,7 @@ const initializeDatabse = async () => {
           EMBEDDING VECTOR (1536)
         );`
     );
-    await pool.query(
+    await client.query(
       `
       CREATE OR REPLACE FUNCTION MATCH_DOCUMENTS (
         QUERY_EMBEDDING VECTOR (1536),
@@ -48,7 +56,7 @@ const initializeDatabse = async () => {
     console.log("Database Ready");
     return;
   } catch (error) {
-    console.log(error);
+    console.log(error.message);
     return;
   }
 };

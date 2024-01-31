@@ -1,27 +1,26 @@
 const { RecursiveCharacterTextSplitter } = require("langchain/text_splitter");
 const { getRepoByName } = require("../repos/repos.controller");
-const {getUserById} = require("../../models/users.model");
+const { getUserById } = require("../../models/users.model");
 const { OpenAIEmbeddings } = require("@langchain/openai");
-const pool = require("../../services/db");
+const client = require("../../services/db");
+const pgvector = require("pgvector/pg");
 
 const openAIEmbeddings = new OpenAIEmbeddings({
   openAIApiKey: "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",
-  dimensions: 1536
-})
-
-
+  dimensions: 1536,
+});
 
 function filterRepo(repo) {
   // Function to check if a file path indicates an image, package.lock.json, or node_modules
   const isExcludedFile = (path) => {
-    const excludedExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp'];
-    const excludedFiles = ['package.lock.json'];
-    const excludedFolders = ['node_modules'];
+    const excludedExtensions = [".jpg", ".jpeg", ".png", ".gif", ".bmp"];
+    const excludedFiles = ["package.lock.json"];
+    const excludedFolders = ["node_modules"];
 
     const lowerPath = path.toLowerCase();
-    
+
     // Check for excluded extensions
-    if (excludedExtensions.some(ext => lowerPath.endsWith(ext))) {
+    if (excludedExtensions.some((ext) => lowerPath.endsWith(ext))) {
       return true;
     }
 
@@ -31,7 +30,7 @@ function filterRepo(repo) {
     }
 
     // Check for excluded folders
-    if (excludedFolders.some(folder => lowerPath.includes(`/${folder}/`))) {
+    if (excludedFolders.some((folder) => lowerPath.includes(`/${folder}/`))) {
       return true;
     }
 
@@ -39,11 +38,13 @@ function filterRepo(repo) {
   };
 
   // Filter out objects based on the isExcludedFile function
-  const filteredRepo = repo.filter(file => !isExcludedFile(file.path));
-  return filteredRepo.map((file) => {
-    file.content = encodeURI(file.content)
-    return file
-  })
+  const filteredRepo = repo.filter((file) => !isExcludedFile(file.path));
+  // return filteredRepo.map((file) => {
+  //   file.content = encodeURI(file.content);
+  //   return file;
+  // });
+
+  return filteredRepo
 }
 
 function flattenJSON(obj, parentKey = "") {
@@ -64,8 +65,6 @@ function flattenJSON(obj, parentKey = "") {
   return result;
 }
 
-
-
 const splitter = RecursiveCharacterTextSplitter.fromLanguage("js", {
   chunkSize: 600,
   chunkOverlap: 200,
@@ -80,35 +79,30 @@ const fetchDataToVector = async (data) => {
 
     const texts = await splitter.splitDocuments(output);
 
-    console.log(texts[0]);
-    
-    const query = `
-      INSERT INTO documents (content, metadata, embedding)
-      VALUES ($1, $2, $3);
-    `;
+    const contents = texts.map((text) => text.pageContent);
 
-    for (const text of texts) {
-      // Insert the document data into the PostgreSQL database
-      console.log('textttttttttttttttttttttttttttttt', text, '>>>', text.pageContent, '>>>', text.Document);
-      const embedding = await openAIEmbeddings.embedQuery(text.pageContent)
-      console.log('typeeeeeeeeeeeeeeeeeeeeeeeeeeeeee', embedding);
-      if(Array.isArray(embedding) && embedding.length ){
-        const values = [text.pageContent, text.metadata, embedding];
-        await pool.query(query, values);
-      }
+    const embeddings = await openAIEmbeddings.embedDocuments(contents);
+
+    for (let [index, document] of texts.entries()) {
+      await client.query(
+        `INSERT INTO documents (content, metadata, embedding) VALUES ($1, $2, $3)`,
+        [
+          document.pageContent,
+          document.metadata,
+          pgvector.toSql(embeddings[index]),
+        ]
+      );
     }
-
     return "Successfully vectorized and inserted repo data to DB";
   } catch (err) {
-    console.log('>>>>>>>>>>>>>>>',err);
+    console.log(">>>>>>>>>>>>>>>", err);
     throw new Error("Failed to vectorize and insert repo to DB");
   }
 };
 
 const fetchDataFromRepoName = async (req, res) => {
   const { repo_name } = req.params;
-  
-  
+
   try {
     const { user_name, access_token } = await getUserById(req.user);
     const repoData = await getRepoByName(repo_name, access_token, user_name);

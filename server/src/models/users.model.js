@@ -1,8 +1,8 @@
-const pool = require('../services/db');
+const client = require('../services/db');
 
 const createNewUser = async (id, userName, accessToken) => {
     try { 
-      const res = await pool.query(
+      const res = await client.query(
         "INSERT INTO users(id, user_name, access_token) VALUES($1, $2, $3) RETURNING *",
         [id, userName, accessToken]
       );
@@ -15,7 +15,7 @@ const createNewUser = async (id, userName, accessToken) => {
 
 const getUserById = async(id) => {
     try {
-      const res = await pool.query(
+      const res = await client.query(
         'SELECT * FROM users WHERE id = $1',
         [id]
       );
