@@ -1,9 +1,9 @@
 const { ChatOpenAI } = require("@langchain/openai");
 const { PromptTemplate } = require("@langchain/core/prompts");
-const { createClient } = require("@supabase/supabase-js");
-const { SupabaseVectorStore } = require("@langchain/community/vectorstores/supabase");
 const { OpenAIEmbeddings } = require("@langchain/openai");
 const { StringOutputParser } = require("@langchain/core/output_parsers");
+const client = require("../../services/db");
+const pgvector = require("pgvector/pg");
 const {
   RunnablePassthrough,
   RunnableSequence,
@@ -11,34 +11,35 @@ const {
 } = require("@langchain/core/runnables");
 
 const openAIApiKey = "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";
-const sbApiKey =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ2aGJ3eHNiamlsZ2dseWx1YXRlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDU1MjQwNTAsImV4cCI6MjAyMTEwMDA1MH0.EVySSW42rwaQPnKojsUdd-3DdEpRDF3XFvI2u9WoHS0";
-const sbUrl = "https://vvhbwxsbjilgglyluate.supabase.co";
 
-const embeddings = new OpenAIEmbeddings({ openAIApiKey });
-const client = createClient(sbUrl, sbApiKey);
-
-const vectorStore = new SupabaseVectorStore(embeddings, {
-  client,
-  tableName: "documents",
-  queryName: "match_documents",
+const openAIEmbeddings = new OpenAIEmbeddings({
+  openAIApiKey: "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",
+  dimensions: 1536,
 });
 
-const retriever = vectorStore.asRetriever({
-  searchType: "mmr", // Use max marginal relevance search
-  searchKwargs: { fetchK: 5 },
-});
+//CREATE A CUSTOM RETRIEVER FUNCTION THAT TAKES THE STANDALONE QUESTION VECTORIZES IT AND PASSES IT TO
+//THE MATCH_DOCUMENTS IN DB AND RETURN THE RESULT WITH MAYBE 5 SEARCH RESULTS
+
+const retriever = async (standAloneQuestion) => {
+  const embedding = await openAIEmbeddings.embedQuery(standAloneQuestion);
+  const retrievedEmbedings = await client.query(
+    `SELECT content FROM match_documents($1, $2)`,
+    [pgvector.toSql(embedding), 5]
+  );
+  console.log(retrievedEmbedings.rows);
+  return retrievedEmbedings.rows;
+};
 
 const llm = new ChatOpenAI({
   openAIApiKey,
-//   maxTokens: 400,
+  //   maxTokens: 400,
   streaming: true,
 });
 
 // UTILS -----------------------------------
 
 const combineDocuments = (docs) => {
-  return docs.map((doc) => doc.pageContent).join("\n\n");
+  return docs.map((doc) => doc.content).join("\n\n");
 };
 
 //Templates -----------------
@@ -54,8 +55,7 @@ const answerTemplate = `
 You are a helpful and enthusiastic support bot who can answer a given question
 about the codebase based on the context provided but also considering the conv_history but remember that
 context holds more weight than the conv_history you should go to history only when you cant find any data related 
-to the question in the context. Try to find the answer in the context also try to not show any piece of code in from the 
-context unless it is a fix or modification. If the question is not about something included in the code base but for 
+to the question in the context. If the question is not about something included in the code base but for 
 something new the user wants to add to the code give your best 3 options . Always speak as you are a senior developer 
 college talking to a junior developer so be very detailed in your answer also polite and understanding and try to answer as fast as possible and also you have a maximum of 400 tokens to answer.
 context: {context}
