@@ -1,0 +1,10 @@
+# This will exclude all the git files which are to store the branches commits of git
+.git
+
+# We are using the wild card in order to ignore all node_modules from anywere in the project 
+*/node_modules
+
+# this will exclude the build artifacts from since 
+# its going to run the build commands and it going to create its own ones in the container
+server/public
+client/build

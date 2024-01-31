@@ -79,7 +79,6 @@ const getAllRepositories = async (req, res) => {
       repositories: repositoriesWithDetails,
     });
   } catch (error) {
-    console.log(error.message);
     return res.status(500).json({
       error: "Failed to fetch repositories",
     });

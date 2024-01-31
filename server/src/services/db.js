@@ -1,8 +1,8 @@
-const {Pool} = require('pg');
+const { Pool } = require('pg');
 
 const pool = new Pool({
-    host: 'localhost',
-    port: 5432,
+    host: 'db',       // Use the actual Docker host IP
+    port: 5432,               // Default PostgreSQL port
     user: 'postgres',
     database: 'postgres',
     password: 'postgres'

@@ -13,12 +13,9 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 const deleteAndCreateDocumentsTable = async (req, res) => {
   
 const { data } = await supabase.auth.getUser()
-  console.log('++++++++++++',data);
   try {
     const { data, error } = await supabase.rpc("truncate_documents");
 
-    console.log("Documents table created successfully", data);
-    console.log('erorororororororo', error);
     res.json({ message: "Documents table created successfully" });
   } catch (error) {
     console.error("Error deleting/creating documents table:", error);
