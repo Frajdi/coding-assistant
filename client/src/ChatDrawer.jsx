@@ -6,13 +6,22 @@ import IconButton from "@mui/material/IconButton";
 import Divider from "@mui/material/Divider";
 import Stack from "@mui/material/Stack";
 import DirectionsIcon from "@mui/icons-material/Directions";
+import Fab from "@mui/material/Fab";
+import CircularProgress from "@mui/material/CircularProgress";
 import { MessageList } from "react-chat-elements";
 import axios from "axios";
 import "react-chat-elements/dist/main.css";
 
-export default function ChatDrawer() {
+const buttonSx = {
+  "&:hover": {
+    bgcolor: "#D2CC74",
+  },
+};
+
+const ChatDrawer = () => {
   const [inputValue, setInputValue] = useState("");
   const [messages, setMessages] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (messages.length) {
@@ -56,7 +65,7 @@ export default function ChatDrawer() {
         title: "AI",
         text: data.answer,
       };
-
+      setLoading((prev) => !prev)
       setMessages((prev) => [...prev, formatedResponse]);
       console.log("Post request successful", response.data);
     } catch (error) {
@@ -67,6 +76,7 @@ export default function ChatDrawer() {
 
   const handleNewMessage = () => {
     if (inputValue) {
+      setLoading((prev) => !prev)
       setMessages((prev) => [
         ...prev,
         {
@@ -149,7 +159,7 @@ export default function ChatDrawer() {
                   orientation="vertical"
                 />
                 <Stack height={"100%"} justifyContent={"flex-end"}>
-                  <IconButton
+                  {/* <IconButton
                     onClick={() => {
                       handleNewMessage();
                     }}
@@ -157,7 +167,31 @@ export default function ChatDrawer() {
                     aria-label="directions"
                   >
                     <DirectionsIcon />
-                  </IconButton>
+                  </IconButton> */}
+                  <Box sx={{ m: 1, position: "relative"}}>
+                  <Fab
+                    aria-label="send"
+                    color="primary"
+                    sx={buttonSx}
+                    onClick={() => {
+                      handleNewMessage();
+                    }}
+                  >
+                    <DirectionsIcon />
+                  </Fab>
+                  {loading && (
+                    <CircularProgress
+                      size={68}
+                      sx={{
+                        color: "#D2CC74",
+                        position: "absolute",
+                        top: -6,
+                        left: -6,
+                        zIndex: 1,
+                      }}
+                    />
+                  )}
+                  </Box>
                 </Stack>
               </>
             ),
@@ -167,3 +201,5 @@ export default function ChatDrawer() {
     </>
   );
 }
+
+export default ChatDrawer;

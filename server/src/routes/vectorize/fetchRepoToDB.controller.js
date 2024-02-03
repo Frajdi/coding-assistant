@@ -10,6 +10,25 @@ const openAIEmbeddings = new OpenAIEmbeddings({
   dimensions: 1536,
 });
 
+
+function stringifyData(data) {
+  // Check if the data is an object or an array
+  if (typeof data === 'object' && data !== null) {
+    // If it's an array, stringify each element
+    if (Array.isArray(data)) {
+      return `[${data.map(item => stringifyData(item)).join(', ')}]`;
+    }
+    
+    // If it's an object, stringify each key-value pair
+    const keyValuePairs = Object.entries(data)
+      .map(([key, value]) => `"${key}": ${stringifyData(value)}`);
+    return `{${keyValuePairs.join(', ')}}`;
+  } else {
+    // If it's not an object or array, stringify the primitive value
+    return JSON.stringify(data);
+  }
+}
+
 function filterRepo(repo) {
   // Function to check if a file path indicates an image, package.lock.json, or node_modules
   const isExcludedFile = (path) => {
@@ -44,7 +63,11 @@ function filterRepo(repo) {
   //   return file;
   // });
 
-  return filteredRepo
+  console.log(filteredRepo);
+
+  const preparedRepo = filteredRepo.map((file) => stringifyData(file.content));
+
+  return preparedRepo;
 }
 
 function flattenJSON(obj, parentKey = "") {

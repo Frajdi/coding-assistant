@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {useNavigate} from "react-router-dom"
 import Paper from "@mui/material/Paper";
 import Chip from "@mui/material/Chip";
@@ -20,7 +20,7 @@ const buttonSx = {
 const RepoCard = ({ repoData }) => {
   const navigate = useNavigate()
   const { languages, name, updated_at, visibility } = repoData;
-  const loading = false;
+  const [loading, setLoading] = useState(false)
 
   const fillDataBase = async (repoName) => {
     const url = `https://localhost:3000/v1/vectorize/sync-data/${repoName}`;
@@ -35,10 +35,12 @@ const RepoCard = ({ repoData }) => {
   };
 
   const handlefetchRepo = async(repoName) =>{
+    setLoading(true)
       try {
         await fillDataBase(repoName)
         navigate(`/repo/${repoName}`)
       } catch (error) {
+        setLoading(false)
         console.log(error);
       }
   } 
