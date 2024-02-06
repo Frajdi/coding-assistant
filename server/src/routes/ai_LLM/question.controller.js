@@ -46,7 +46,7 @@ const combineDocuments = (docs) => {
 
 const standaloneQuestionTemplate = `
 Given a question and the conv_history, convert it to a standalone question as fast as
-possible dont get to much based on the conv history if it is not related to the question.
+possible dont get to much based on the conv_history if it is not related to the question.
    question: {question}
    conv_history: {conv_history}
    `;
@@ -60,7 +60,6 @@ something new the user wants to add to the code give your best 3 options . Alway
 college talking to a junior developer so be very detailed in your answer also polite and understanding and try to answer as fast as possible and also you have a maximum of 400 tokens to answer.
 context: {context}
 question: {question}
-conv_history: {conv_history}
 answer:
 `;
 
@@ -70,7 +69,6 @@ answer is found to and your response, it should be something similar to 'path: s
 you should be only the path no extra words and make sure you dont remove file extensions from the path.
 context: {context}
 question: {question}
-conv_history: {conv_history}
 path:
 `;
 
@@ -110,8 +108,7 @@ const chain = RunnableSequence.from([
   },
   {
     context: retrieverChain,
-    question: ({ original_input }) => original_input.question,
-    conv_history: ({ original_input }) => original_input.conv_history,
+    question: ({ original_input }) => original_input.question
   },
   answerAndPathMap,
 ]);
