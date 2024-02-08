@@ -9,6 +9,8 @@ const {
   RunnableSequence,
   RunnableMap,
 } = require("@langchain/core/runnables");
+const { CallbackManager } = require("langchain/callbacks");
+const socket = require('../../server');
 
 const openAIApiKey = "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";
 
@@ -32,8 +34,20 @@ const retriever = async (standAloneQuestion) => {
 
 const llm = new ChatOpenAI({
   openAIApiKey,
-  //   maxTokens: 400,
+});
+
+const answerLlm = new ChatOpenAI({
+  openAIApiKey,
   streaming: true,
+  callbackManager: CallbackManager.fromHandlers({
+    async handleLLMNewToken(token) {
+      console.log({ token });
+      socket.ioObject.emit('answer', token)
+    },
+    async handleLLMEnd(output) {
+      socket.ioObject.emit('end', true)
+    },
+  }),
 });
 
 // UTILS -----------------------------------
@@ -92,7 +106,7 @@ const retrieverChain = RunnableSequence.from([
   combineDocuments,
 ]);
 
-const answerChain = answerPrompt.pipe(llm).pipe(new StringOutputParser());
+const answerChain = answerPrompt.pipe(answerLlm).pipe(new StringOutputParser());
 
 const filePathChain = filePathPrompt.pipe(llm).pipe(new StringOutputParser());
 
@@ -108,13 +122,14 @@ const chain = RunnableSequence.from([
   },
   {
     context: retrieverChain,
-    question: ({ original_input }) => original_input.question
+    question: ({ original_input }) => original_input.question,
   },
   answerAndPathMap,
 ]);
 
 // FINAL FUNCTION ----------------------------------------
 
+// Modify the function to output partial responses
 const getAnswer = async (question, conv_history) => {
   const response = await chain.invoke({
     question,

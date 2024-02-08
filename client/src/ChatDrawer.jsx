@@ -11,6 +11,8 @@ import CircularProgress from "@mui/material/CircularProgress";
 import { MessageList } from "react-chat-elements";
 import axios from "axios";
 import "react-chat-elements/dist/main.css";
+import { socket } from "./socket";
+
 
 const buttonSx = {
   "&:hover": {
@@ -18,10 +20,38 @@ const buttonSx = {
   },
 };
 
+
 const ChatDrawer = () => {
   const [inputValue, setInputValue] = useState("");
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    socket.on('answer', (answerChunk) => {
+      setMessages((prev) => {
+        const newMessages = [...prev];
+        if (prev.length > 0 && prev[prev.length - 1].title === "AI") {
+          // If the last message was from AI, append the answer chunk to it
+          newMessages[prev.length - 1].text += answerChunk;
+        } else {
+          // Otherwise, create a new message
+          newMessages.push({
+            position: "left",
+            type: "text",
+            title: "AI",
+            text: answerChunk,
+          });
+        }
+        return newMessages;
+      });
+    });
+
+
+    socket.on('end', (didEnd) => {
+      setLoading((prev) => !prev)
+    });
+
+  },[]);
 
   useEffect(() => {
     if (messages.length) {
@@ -57,16 +87,7 @@ const ChatDrawer = () => {
             "Content-Type": "application/json",
           },
         }
-      );
-
-      const formatedResponse = {
-        position: "left",
-        type: "text",
-        title: "AI",
-        text: data.answer,
-      };
-      setLoading((prev) => !prev)
-      setMessages((prev) => [...prev, formatedResponse]);
+      );      
       console.log("Post request successful", response.data);
     } catch (error) {
       // Handle errors
