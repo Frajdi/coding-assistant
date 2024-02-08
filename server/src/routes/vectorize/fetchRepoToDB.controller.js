@@ -121,7 +121,6 @@ const fetchDataToVector = async (data) => {
     }
     return "Successfully vectorized and inserted repo data to DB";
   } catch (err) {
-    console.log(">>>>>>>>>>>>>>>", err);
     throw new Error("Failed to vectorize and insert repo to DB");
   }
 };

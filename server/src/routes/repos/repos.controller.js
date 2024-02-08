@@ -11,31 +11,6 @@ const checkLoggedIn = (req, res, next) => {
   next();
 };
 
-// const getAllRepositories = async (req, res) => {
-//   try {
-//     const { user_name, access_token } = await getUserById(req.user);
-
-//     // Fetch user's repositories using the GitHub API
-//     const { data } = await axios.get(
-//       `https://api.github.com/users/${user_name}/repos`,
-//       {
-//         headers: {
-//           Authorization: `Bearer ${access_token}`,
-//         },
-//       }
-//     );
-
-//     return res.json({
-//       user: user_name,
-//       repositories: data,
-//     });
-//   } catch (error) {
-//     console.log(error.message);
-//     return res.status(500).json({
-//       error: "Failed to fetch repositories",
-//     });
-//   }
-// };
 
 const getAllRepositories = async (req, res) => {
   try {
