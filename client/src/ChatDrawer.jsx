@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import Drawer from "@mui/material/Drawer";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
-import IconButton from "@mui/material/IconButton";
 import Divider from "@mui/material/Divider";
 import Stack from "@mui/material/Stack";
 import DirectionsIcon from "@mui/icons-material/Directions";
@@ -18,6 +17,8 @@ const buttonSx = {
   "&:hover": {
     bgcolor: "#D2CC74",
   },
+  height: 30,
+  width: 35
 };
 
 
@@ -117,10 +118,10 @@ const ChatDrawer = () => {
         variant="permanent"
         anchor="right"
         sx={{
-          width: 500,
+          width: '60%',
           flexShrink: 0,
           [`& .MuiDrawer-paper`]: {
-            width: 400,
+            width: '35%',
             boxSizing: "border-box",
           },
         }}
@@ -180,15 +181,6 @@ const ChatDrawer = () => {
                   orientation="vertical"
                 />
                 <Stack height={"100%"} justifyContent={"flex-end"}>
-                  {/* <IconButton
-                    onClick={() => {
-                      handleNewMessage();
-                    }}
-                    color="primary"
-                    aria-label="directions"
-                  >
-                    <DirectionsIcon />
-                  </IconButton> */}
                   <Box sx={{ m: 1, position: "relative"}}>
                   <Fab
                     aria-label="send"
@@ -202,7 +194,7 @@ const ChatDrawer = () => {
                   </Fab>
                   {loading && (
                     <CircularProgress
-                      size={68}
+                      size={48}
                       sx={{
                         color: "#D2CC74",
                         position: "absolute",

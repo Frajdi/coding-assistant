@@ -70,8 +70,8 @@ export default function ClippedDrawer() {
 
   const buildTree = (paths) => {
     const tree = {
-      id: "project-name",
-      name: "Project-Name",
+      id: reponame,
+      name: reponame,
       children: [],
     };
 
@@ -131,80 +131,76 @@ export default function ClippedDrawer() {
   );
 
   return (
-    <Box sx={{ display: "flex" }}>
-      <CssBaseline />
-      <AppBar
-        position="fixed"
-        sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
-      >
-        <Toolbar>
-          <Stack
-            direction={"row"}
-            justifyContent={"space-between"}
-            width={"100%"}
-          >
-            <Typography variant="h6" noWrap component="div">
-              AI CODING ASSISTANT
-            </Typography>
-            <Button
-              href="https://localhost:3000/v1/auth/github"
-              variant="contained"
+    <>
+      <Box sx={{ display: "flex" }}>
+        <CssBaseline />
+        <AppBar
+          position="fixed"
+          sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        >
+          <Toolbar>
+            <Stack
+              direction={"row"}
+              justifyContent={"space-between"}
+              width={"100%"}
             >
-              Log In
-            </Button>
-          </Stack>
-        </Toolbar>
-      </AppBar>
-      <Drawer
-        variant="permanent"
-        sx={{
-          width: drawerWidth,
-          flexShrink: 0,
-          [`& .MuiDrawer-paper`]: {
-            width: drawerWidth,
-            boxSizing: "border-box",
-          },
-        }}
-      >
-        <Toolbar />
-        <Box sx={{ overflow: "auto", height: "100%" }}>
-          {allPaths && (
-            <TreeView
-              aria-label="file system navigator"
-              defaultCollapseIcon={<ExpandMoreIcon />}
-              defaultExpandIcon={<ChevronRightIcon />}
-              sx={{
-                height: "100%",
-                flexGrow: 1,
-                maxWidth: 400,
-                overflowY: "auto",
-              }}
-              onNodeSelect={handlePathChange}
-            >
-              {renderTree(treeData)}
-            </TreeView>
-          )}
-        </Box>
-      </Drawer>
-      <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
-        <Toolbar />
-        {/* <div>{createReactElements(currentContent)}</div> */}
-        {!currentContent ? (
-          <Typography>Welcome To Coding Assistant Ai</Typography>
-        ) : (
-          currentContent.split("@newLine@").map((line) => {
-            console.log(line);
-            if (!line) return;
-            return (
-              <Typography m={0} color="primary">
-                <pre style={{ margin: 0 }}>{line}</pre>
+              <Typography variant="h6" noWrap component="div">
+                AI CODING ASSISTANT
               </Typography>
-            );
-          })
-        )}
-        {/* <Typography paragraph>{currentContent}</Typography> */}
+            </Stack>
+          </Toolbar>
+        </AppBar>
+        <Drawer
+          variant="permanent"
+          sx={{
+            width: drawerWidth,
+            flexShrink: 0,
+            [`& .MuiDrawer-paper`]: {
+              width: drawerWidth,
+              boxSizing: "border-box",
+            },
+          }}
+        >
+          <Toolbar />
+          <Box sx={{ overflow: "auto", height: "100%" }}>
+            {allPaths && (
+              <TreeView
+                aria-label="file system navigator"
+                defaultCollapseIcon={<ExpandMoreIcon />}
+                defaultExpandIcon={<ChevronRightIcon />}
+                sx={{
+                  height: "100%",
+                  flexGrow: 1,
+                  maxWidth: 400,
+                  overflowY: "auto",
+                }}
+                onNodeSelect={handlePathChange}
+              >
+                {renderTree(treeData)}
+              </TreeView>
+            )}
+          </Box>
+        </Drawer>
+        <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+          <Toolbar />
+          {/* <div>{createReactElements(currentContent)}</div> */}
+          {!currentContent ? (
+            <Typography>Welcome To Coding Assistant Ai</Typography>
+          ) : (
+            currentContent.split("@newLine@").map((line) => {
+              console.log(line);
+              if (!line) return;
+              return (
+                <Typography m={0} color="primary">
+                  <pre style={{ margin: 0 }}>{line}</pre>
+                </Typography>
+              );
+            })
+          )}
+          {/* <Typography paragraph>{currentContent}</Typography> */}
+        </Box>
       </Box>
       <ChatDrawer />
-    </Box>
+    </>
   );
 }

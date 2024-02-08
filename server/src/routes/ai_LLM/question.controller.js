@@ -9,13 +9,14 @@ const {
   RunnableSequence,
   RunnableMap,
 } = require("@langchain/core/runnables");
-const { CallbackManager } = require("langchain/callbacks");
+const { CallbackManager } = require("@langchain/core/callbacks/manager");
 const socket = require('../../server');
+require('dotenv').config();
 
-const openAIApiKey = "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";
+const openAIKey = process.env.OPENAI_KEY;
 
 const openAIEmbeddings = new OpenAIEmbeddings({
-  openAIApiKey: "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",
+  openAIApiKey: openAIKey,
   dimensions: 1536,
 });
 
@@ -33,11 +34,11 @@ const retriever = async (standAloneQuestion) => {
 };
 
 const llm = new ChatOpenAI({
-  openAIApiKey,
+  openAIApiKey: openAIKey,
 });
 
 const answerLlm = new ChatOpenAI({
-  openAIApiKey,
+  openAIApiKey: openAIKey,
   streaming: true,
   callbackManager: CallbackManager.fromHandlers({
     async handleLLMNewToken(token) {

@@ -4,9 +4,12 @@ const { getUserById } = require("../../models/users.model");
 const { OpenAIEmbeddings } = require("@langchain/openai");
 const client = require("../../services/db");
 const pgvector = require("pgvector/pg");
+require('dotenv').config();
+
+const openAiKey = process.env.OPENAI_KEY;
 
 const openAIEmbeddings = new OpenAIEmbeddings({
-  openAIApiKey: "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",
+  openAIApiKey: openAiKey,
   dimensions: 1536,
 });
 
@@ -32,8 +35,8 @@ function stringifyData(data) {
 function filterRepo(repo) {
   // Function to check if a file path indicates an image, package.lock.json, or node_modules
   const isExcludedFile = (path) => {
-    const excludedExtensions = [".jpg", ".jpeg", ".png", ".gif", ".bmp"];
-    const excludedFiles = ["package.lock.json"];
+    const excludedExtensions = [".jpg", ".jpeg", ".png", ".gif", ".bmp", "mp3", "mp4"];
+    const excludedFiles = ["package-lock.json"];
     const excludedFolders = ["node_modules"];
 
     const lowerPath = path.toLowerCase();
