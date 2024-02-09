@@ -142,7 +142,6 @@ const getRepoContentsByName = async (req, res) => {
     // Format the content property of each object
     repoContent.forEach((obj) => {
       if (typeof obj.content === "string") {
-        // Replace newline characters with <br> tags
         obj.content = obj.content.replace(/\n/g, "@newLine@");
       }
     });

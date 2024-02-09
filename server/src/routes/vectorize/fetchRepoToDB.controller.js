@@ -10,6 +10,7 @@ const openAiKey = process.env.OPENAI_KEY;
 
 const openAIEmbeddings = new OpenAIEmbeddings({
   openAIApiKey: openAiKey,
+  modelName: 'text-embedding-3-small',
   dimensions: 1536,
 });
 
@@ -58,18 +59,9 @@ function filterRepo(repo) {
 
     return false;
   };
-
   // Filter out objects based on the isExcludedFile function
   const filteredRepo = repo.filter((file) => !isExcludedFile(file.path));
-  // return filteredRepo.map((file) => {
-  //   file.content = encodeURI(file.content);
-  //   return file;
-  // });
-
-  console.log(filteredRepo);
-
   const preparedRepo = filteredRepo.map((file) => stringifyData(file.content));
-
   return preparedRepo;
 }
 

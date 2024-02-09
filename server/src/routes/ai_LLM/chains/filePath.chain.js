@@ -7,6 +7,7 @@ const openAIKey = process.env.OPENAI_KEY;
 
 const llm = new ChatOpenAI({
   openAIApiKey: openAIKey,
+  modelName: 'gpt-3.5-turbo-0125'
 });
 
 const filePathTemplate = `

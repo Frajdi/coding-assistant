@@ -9,6 +9,7 @@ const openAIKey = process.env.OPENAI_KEY;
 
 const openAIEmbeddings = new OpenAIEmbeddings({
   openAIApiKey: openAIKey,
+  modelName: 'text-embedding-3-small',
   dimensions: 1536,
 });
 
