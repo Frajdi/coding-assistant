@@ -9,7 +9,8 @@ const openAIKey = process.env.OPENAI_KEY;
 
 const answerLlm = new ChatOpenAI({
   openAIApiKey: openAIKey,
-  modelName: 'gpt-3.5-turbo-0125',
+  // modelName: 'gpt-3.5-turbo-0125',
+  modelName: 'gpt-4-0125-preview',
   streaming: true,
   callbackManager: CallbackManager.fromHandlers({
     async handleLLMNewToken(token) {
