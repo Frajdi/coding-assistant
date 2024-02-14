@@ -6,7 +6,6 @@ const getAnswer = async (question, conv_history) => {
     conv_history,
   });
 
-  console.log('---->>>',response,'<<<<----');
   return response;
 };
 

@@ -4,11 +4,20 @@ import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
 
-const Profile = ({owner}) => {
+const Profile = ({ owner }) => {
+  const {
+    userName,
+    avatarURL,
+    totalRepositories,
+    followersCount,
+    followingCount,
+  } = owner;
 
-    const {name, avatar_url, public_repos, followers, following} = owner;
-
-    console.log('AVATAR',avatar_url);
+  // console.log( userName,
+  //   avatarURL,
+  //   totalRepositories,
+  //   followersCount,
+  //   followingCount,);
 
 
   return (
@@ -49,11 +58,11 @@ const Profile = ({owner}) => {
           spacing={2}
         >
           <img
-            src={avatar_url}
+            src={avatarURL}
             style={{ width: "50%", borderRadius: "40%", marginTop: "3rem" }}
           />
           <Typography variant="h3" color="rgba(0, 0, 0, 0.5)">
-            {name}
+            {userName}
           </Typography>
         </Stack>
         <Grid container spacing={2}>
@@ -64,10 +73,10 @@ const Profile = ({owner}) => {
               alignItems={"center"}
             >
               <Typography variant="h3" color="primary">
-                {public_repos}
+                {totalRepositories}
               </Typography>
               <Typography variant="caption" color="primary">
-                Public Repos
+                Repos
               </Typography>
             </Stack>
           </Grid>
@@ -78,7 +87,7 @@ const Profile = ({owner}) => {
               alignItems={"center"}
             >
               <Typography variant="h3" color="primary">
-                {followers}
+                {followersCount}
               </Typography>
               <Typography variant="caption" color="primary">
                 Followers
@@ -92,7 +101,7 @@ const Profile = ({owner}) => {
               alignItems={"center"}
             >
               <Typography variant="h3" color="primary">
-                {following}
+                {followingCount}
               </Typography>
               <Typography variant="caption" color="primary">
                 following

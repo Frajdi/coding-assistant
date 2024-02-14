@@ -1,19 +1,32 @@
-const pgvector = require('pgvector/pg');
+const pgvector = require("pgvector/pg");
 const client = require("./db");
-var pg = require('pg');
+var pg = require("pg");
 
 const initializeDatabse = async () => {
   try {
-
-    await client.connect()
+    await client.connect();
 
     await client.query(`CREATE EXTENSION IF NOT EXISTS vector;`);
-    
-    await pgvector.registerType(client);
 
+    await pgvector.registerType(client);
+    	
+    //create users table
     await client.query(
-      "CREATE TABLE IF NOT EXISTS users(id INT, user_name VARCHAR(50), access_token VARCHAR(50))"
-    );
+      `CREATE TABLE users (
+        user_id NUMERIC PRIMARY KEY,
+        user_name VARCHAR(100),
+        access_token VARCHAR(100)
+    );`);
+
+    //create fetched repositories table
+    await client.query(
+      `CREATE TABLE fetched_repositories (
+        repository_id VARCHAR(50) PRIMARY KEY,
+        user_id NUMERIC REFERENCES users(user_id),
+        name VARCHAR(100),
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );`);
+
     await client.query(
       `CREATE TABLE IF NOT EXISTS
         DOCUMENTS (

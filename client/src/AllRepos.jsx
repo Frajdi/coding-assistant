@@ -13,13 +13,13 @@ const AllRepos = () => {
   const [owner, setOwner] = useState(null);
 
   useEffect(() => {
-    clearDBGetResponse()
+    clearDBGetResponse();
   }, []);
 
-  const clearDBGetResponse = async() => {
+  const clearDBGetResponse = async () => {
     await getResponse();
     await clearDatabase();
-  }
+  };
 
   const clearDatabase = async () => {
     const url = "https://localhost:3000/v1/vectorize/truncation";
@@ -33,33 +33,64 @@ const AllRepos = () => {
     }
   };
 
-  const getResponse = async (question, conv_history) => {
+  const getResponse = async () => {
     const url = "https://localhost:3000/v1/repos";
 
     try {
       const { data } = await axios.get(url);
-      setRepos(data.repositories);
-      sepparateOwnerData(data);
+      console.log(data.data);
+      const repos = data.data.user.repositories.nodes;
+      repos.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+      setRepos([...repos]);
+      sepparateOwnerData(data.data);
     } catch (error) {
       // Handle errors
       console.error("Error during post request", error);
     }
   };
 
-  const sepparateOwnerData = (data) => {
-    const userName = data.user;
-
-    const repoData = data.repositories.find(
-      (repo) => repo.owner.login === userName
-    );
-
-    setOwner(repoData.owner);
+  const getUploadedRepos = async () => {
+    const url = "https://localhost:3000/v1/repos/fetched-repos";
+    try {
+      const { data } = await axios.get(url);
+      console.log(data);
+    } catch (error) {
+      console.error("Error during post request", error);
+    }
   };
+
+  const sepparateOwnerData = (data) => {
+    const userName = data.user.name;
+    const avatarURL = data.user.avatarUrl;
+    const totalRepositories = data.user.repositories.totalCount;
+    const followersCount = data.user.followers.totalCount;
+    const followingCount = data.user.following.totalCount;
+
+    setOwner({
+      userName,
+      avatarURL,
+      totalRepositories,
+      followersCount,
+      followingCount,
+    });
+  };
+
+  useEffect(() => {
+    console.log("repos", repos);
+    console.log("owner", owner);
+  }, [repos, owner]);
 
   if (!repos && !owner) return "Loading...";
 
   return (
     <Stack sx={{ padding: "3rem" }} spacing={2}>
+      {/* <button
+        onClick={() => {
+          getUploadedRepos();
+        }}
+      >
+        test
+      </button> */}
       <Stack spacing={2} direction={"row"}>
         <AppsIcon sx={{ fontSize: "3rem" }} color="primary" />
         <Typography variant="h3" color="primary">
@@ -78,11 +109,14 @@ const AllRepos = () => {
         </Grid>
         <Grid item xs={9} padding={10}>
           <Grid container spacing={3} justifyContent={"space-around"}>
-            {repos.map((repo) => (
-              <Grid item xs={12}>
-                <RepoCard repoData={repo} />
-              </Grid>
-            ))}
+            {repos.map((repo) => {
+              console.log(repo);
+              return (
+                <Grid item xs={12}>
+                  <RepoCard repoData={repo} />
+                </Grid>
+              );
+            })}
           </Grid>
         </Grid>
       </Grid>

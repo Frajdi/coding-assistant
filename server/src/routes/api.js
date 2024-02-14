@@ -7,14 +7,15 @@ const { createNewUser } = require("../models/users.model");
 const authRouter = require("./authorization/authorization.router");
 const artificialIntelligenceRouter = require("./ai_LLM/question.router");
 const vectorizeRouter = require('./vectorize/vectorize.router');
+require("dotenv").config();
 
 const api = express.Router();
 
 const config = {
-  CLIENT_ID: "c020288fd5a399a67e79",
-  CLIENT_SECRET: "3440256f830156b63c6078ee55382fb1c20aa6a4",
-  COOKIE_KEY_1: "mainKey",
-  COOKIE_KEY_2: "rotationKey",
+  CLIENT_ID: process.env.GITHUB_CLIENT_ID,
+  CLIENT_SECRET: process.env.GITHUB_CLIENT_SECRET,
+  COOKIE_KEY_1: process.env.COOKIE_KEY_1,
+  COOKIE_KEY_2: process.env.COOKIE_KEY_2,
 };
 
 const AUTH_OPTIONS = {

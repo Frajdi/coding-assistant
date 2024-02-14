@@ -19,14 +19,28 @@ const buttonSx = {
 
 const RepoCard = ({ repoData }) => {
   const navigate = useNavigate()
-  const { languages, name, updated_at, visibility } = repoData;
+  const { languages, name, updatedAt, isPrivate, id } = repoData;
+
+  // console.log(languages, name, updatedAt, isPrivate, id);
   const [loading, setLoading] = useState(false)
 
   const fillDataBase = async (repoName) => {
-    const url = `https://localhost:3000/v1/vectorize/sync-data/${repoName}`;
+    const url = `https://localhost:3000/v1/vectorize/sync-repo`;
 
     try {
-      const response = await axios.get(url);
+      const response = await axios.post(
+        url,
+        JSON.stringify({
+          repo_name: repoName,
+          updatedAt,
+          id,
+        }),
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
       console.log(response);
     } catch (error) {
       // Handle errors
@@ -46,10 +60,11 @@ const RepoCard = ({ repoData }) => {
   } 
 
   const splitObjectKeysAndValues = (inputObject) => {
-    const keysArray = Object.keys(inputObject);
-    const valuesArray = Object.values(inputObject);
+    
+    // const keysArray = inputObject.nodes.map((node) => node.name)
+    console.log('>>', inputObject.nodes);
 
-    return { keys: keysArray, values: valuesArray };
+    return { keys: 'test', values: 3 };
   };
 
   return (
@@ -68,13 +83,13 @@ const RepoCard = ({ repoData }) => {
           width={"30%"}
         >
           <Typography variant="h4">{name}</Typography>
-          <Chip label={visibility} variant="filled" />
+          <Chip label={isPrivate ? 'Private' : 'Public'} variant="filled" />
           <Typography sx={{ opacity: 0.4 }}>
-            Last Update {updated_at}
+            Last Update {updatedAt}
           </Typography>
         </Stack>
         <Box sx={{ width: "50%" }}>
-          <SparkLineChart
+          {/* <SparkLineChart
             colors={["#90caf9"]}
             plotType="bar"
             data={splitObjectKeysAndValues(languages).values}
@@ -84,7 +99,7 @@ const RepoCard = ({ repoData }) => {
               data: splitObjectKeysAndValues(languages).keys,
             }}
             height={100}
-          />
+          /> */}
         </Box>
         <Box sx={{ m: 1, position: "relative", marginLeft: 5 }}>
           <Fab
