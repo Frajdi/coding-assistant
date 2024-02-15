@@ -27,7 +27,7 @@ const getRepositoryContentsByName = async (req, res) => {
 
     repoContent.forEach((obj) => {
       if (typeof obj.content === "string") {
-        obj.content = obj.content.replace(/\n/g, "@newLine@");
+        obj.content = obj.content.replace(/\n/g, "\n");
       }
     });
 

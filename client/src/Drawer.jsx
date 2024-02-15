@@ -14,6 +14,8 @@ import { TreeView } from "@mui/x-tree-view/TreeView";
 import { TreeItem } from "@mui/x-tree-view/TreeItem";
 import axios from "axios";
 import ChatDrawer from "./ChatDrawer";
+import { repoData } from "./fakeData/repocontent";
+import { CodeBlock, dracula } from "react-code-blocks";
 
 const drawerWidth = 300;
 
@@ -40,6 +42,7 @@ export default function ClippedDrawer() {
       const { data } = await axios.get(
         `https://localhost:3000/v1/repos/${reponame}`
       );
+      // const data = repoData;
       console.log(data);
       setFullData(data);
       const paths = data.map((item) => item.path);
@@ -181,23 +184,20 @@ export default function ClippedDrawer() {
             )}
           </Box>
         </Drawer>
-        <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+        <Box component="main" sx={{ flexGrow: 1, width: '50%' }} >
           <Toolbar />
-          {/* <div>{createReactElements(currentContent)}</div> */}
           {!currentContent ? (
-            <Typography>Welcome To Coding Assistant Ai</Typography>
+            <Typography>Dev Whisper</Typography>
           ) : (
-            currentContent.split("@newLine@").map((line) => {
-              console.log(line);
-              if (!line) return;
-              return (
-                <Typography m={0} color="primary">
-                  <pre style={{ margin: 0 }}>{line}</pre>
-                </Typography>
-              );
-            })
+            <CodeBlock
+              text={currentContent}
+              language={"javascript"}
+              showLineNumbers={true}
+              theme={dracula}
+              wrapLines
+              // customStyle={{ codeContainer: { width: "50%" } }}
+            />
           )}
-          {/* <Typography paragraph>{currentContent}</Typography> */}
         </Box>
       </Box>
       <ChatDrawer />

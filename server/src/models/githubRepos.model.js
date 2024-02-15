@@ -72,7 +72,7 @@ const getRepositoriesList = async (user_name, access_token) => {
     user(login: $userName) {
       name
       avatarUrl
-      repositories(first: 100) {
+      repositories(first: 100, affiliations: [OWNER, ORGANIZATION_MEMBER, COLLABORATOR], ownerAffiliations: [OWNER, ORGANIZATION_MEMBER, COLLABORATOR], orderBy: {field: UPDATED_AT, direction: DESC}) {
         totalCount
         nodes {
           id

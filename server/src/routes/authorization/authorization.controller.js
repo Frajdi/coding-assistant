@@ -2,7 +2,7 @@ const passport = require("passport");
 
 const authenticateWithGitHub = (req, res, next) => {
   passport.authenticate("github", {
-    scope: ["user:email", "read:repo_hook"],
+    scope: ["user:email", "repo:read"],
   })(req, res, next);
   return
 };

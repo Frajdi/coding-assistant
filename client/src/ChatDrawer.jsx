@@ -12,28 +12,49 @@ import axios from "axios";
 import "react-chat-elements/dist/main.css";
 import { socket } from "./socket";
 
-
 const buttonSx = {
   "&:hover": {
     bgcolor: "#D2CC74",
   },
   height: 30,
-  width: 35
+  width: 35,
 };
-
 
 const ChatDrawer = () => {
   const [inputValue, setInputValue] = useState("");
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [isGeneratingCode, setIsGeneratingCode] = useState(false);
 
   useEffect(() => {
-    socket.on('answer', (answerChunk) => {
+    socket.on("answer", (answerChunk) => {
+      if (answerChunk === "```") {
+        setIsGeneratingCode((prev) => !prev);
+      }
       setMessages((prev) => {
         const newMessages = [...prev];
+
         if (prev.length > 0 && prev[prev.length - 1].title === "AI") {
           // If the last message was from AI, append the answer chunk to it
-          newMessages[prev.length - 1].text += answerChunk;
+          if (isGeneratingCode && prev[prev.length - 1].type === "text") {
+            newMessages.push({
+              position: "left",
+              type: "code",
+              title: "AI",
+              text: answerChunk,
+            });
+          } else {
+            if (!isGeneratingCode && prev[prev.length - 1].type === "code") {
+              newMessages.push({
+                position: "left",
+                type: "text",
+                title: "AI",
+                text: answerChunk,
+              });
+            } else {
+              newMessages[prev.length - 1].text += answerChunk;
+            }
+          }
         } else {
           // Otherwise, create a new message
           newMessages.push({
@@ -47,12 +68,10 @@ const ChatDrawer = () => {
       });
     });
 
-
-    socket.on('end', (didEnd) => {
-      setLoading((prev) => !prev)
+    socket.on("end", (didEnd) => {
+      setLoading((prev) => !prev);
     });
-
-  },[]);
+  }, []);
 
   useEffect(() => {
     if (messages.length) {
@@ -88,7 +107,7 @@ const ChatDrawer = () => {
             "Content-Type": "application/json",
           },
         }
-      );      
+      );
       console.log("Post request successful", response.data);
     } catch (error) {
       // Handle errors
@@ -98,7 +117,7 @@ const ChatDrawer = () => {
 
   const handleNewMessage = () => {
     if (inputValue) {
-      setLoading((prev) => !prev)
+      setLoading((prev) => !prev);
       setMessages((prev) => [
         ...prev,
         {
@@ -118,10 +137,10 @@ const ChatDrawer = () => {
         variant="permanent"
         anchor="right"
         sx={{
-          width: '60%',
+          width: "60%",
           flexShrink: 0,
           [`& .MuiDrawer-paper`]: {
-            width: '35%',
+            width: "35%",
             boxSizing: "border-box",
           },
         }}
@@ -181,29 +200,29 @@ const ChatDrawer = () => {
                   orientation="vertical"
                 />
                 <Stack height={"100%"} justifyContent={"flex-end"}>
-                  <Box sx={{ m: 1, position: "relative"}}>
-                  <Fab
-                    aria-label="send"
-                    color="primary"
-                    sx={buttonSx}
-                    onClick={() => {
-                      handleNewMessage();
-                    }}
-                  >
-                    <DirectionsIcon />
-                  </Fab>
-                  {loading && (
-                    <CircularProgress
-                      size={48}
-                      sx={{
-                        color: "#D2CC74",
-                        position: "absolute",
-                        top: -6,
-                        left: -6,
-                        zIndex: 1,
+                  <Box sx={{ m: 1, position: "relative" }}>
+                    <Fab
+                      aria-label="send"
+                      color="primary"
+                      sx={buttonSx}
+                      onClick={() => {
+                        handleNewMessage();
                       }}
-                    />
-                  )}
+                    >
+                      <DirectionsIcon />
+                    </Fab>
+                    {loading && (
+                      <CircularProgress
+                        size={48}
+                        sx={{
+                          color: "#D2CC74",
+                          position: "absolute",
+                          top: -6,
+                          left: -6,
+                          zIndex: 1,
+                        }}
+                      />
+                    )}
                   </Box>
                 </Stack>
               </>
@@ -213,6 +232,6 @@ const ChatDrawer = () => {
       </Drawer>
     </>
   );
-}
+};
 
 export default ChatDrawer;
