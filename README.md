@@ -17,6 +17,10 @@ You can run the app with the commands from the make file.
 
 Make sure you have docker runing.
 
+After runinng make start make sure to open it on https like below:
+
+https://localhost:3000
+
 
 
 
